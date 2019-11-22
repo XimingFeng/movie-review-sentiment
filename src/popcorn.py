@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from nltk.corpus import stopwords
+import re
 
 class PopcornHelper():
     
@@ -17,12 +18,12 @@ class PopcornHelper():
         test_data = self.read_tsv_file(folder_path + "testData.tsv")
         return train_data, test_data
     
-    def clean_text(text, remove_stopwords=True):
-        text_list = review_text.lower().split()
+    def clean_text(self, text, remove_stopwords=True):
+        text_list = text.lower().split()
         if remove_stopwords:
-            stop_wds = set(stopwords.words("English"))
-            text_list = [wd for wr in text_list if wd not in stop_wds]
-        text = "".join(textlist)
+            stop_wds = set(stopwords.words("english"))
+            text_list = [w for w in text_list]
+        text = " ".join(text_list)
         text = re.sub(r"<br />", " ", text)
         text = re.sub(r"[^a-z]", " ", text)
         text = re.sub(r"   ", " ", text) # Remove any extra spaces
