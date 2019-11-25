@@ -10,7 +10,10 @@ class PopcornHelper():
     def __init__(self):
         self.X_train = None
         self.y_train = None
-        self.x_test = None 
+        self.x_test = None
+        self.stop_wds = {
+            r"<br />", r"[^a-z]",
+        }
     
     def read_tsv_file(self, path):
         return pd.read_csv(path, delimiter="\t")
@@ -20,22 +23,21 @@ class PopcornHelper():
         test_data = self.read_tsv_file(folder_path + "testData.tsv")
         return train_data, test_data
 
-
-    def clean_word(self, word):
-        poter_stemmer = PorterStemmer()
-        word = re.sub(r"<br />", " ", word)
-        word = re.sub(r"[^a-z]", " ", word)
-        word = re.sub(r"   ", " ", word)  # Remove any extra spaces
-        word = re.sub(r"  ", " ", word)
-        word = poter_stemmer.stem(word)
-        return word
+    def is_valid_word(self, word, remove_stop_wds):
+        is_valid = True
+        stop_wds = set(stopwords.words("english"))
+        if (word in stop_wds and remove_stop_wds) or \
+                re.match(r"<br />", word)  or \
+                re.match(r"[^a-z]", word) or \
+                re.match(r"   ", word):
+            is_valid = False
+        return is_valid
 
     def clean_text(self, text, remove_stopwords=True):
         text_list = word_tokenize(text)
-        if remove_stopwords:
-            stop_wds = set(stopwords.words("english"))
-            text_list = [self.clean_word(w) for w in text_list if not w in stop_wds]
-
+        poter_stemmer = PorterStemmer()
+        text_list = [poter_stemmer.stem(w.lower()) for w in text_list
+                     if self.is_valid_word(w.lower(), remove_stopwords)]
         text = " ".join(text_list)
         return text
 
