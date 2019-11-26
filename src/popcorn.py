@@ -1,9 +1,9 @@
-import numpy as np
 import pandas as pd
 from nltk.corpus import stopwords
 import re
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
+from gensim import corpora
 
 class PopcornHelper():
     
@@ -25,19 +25,28 @@ class PopcornHelper():
 
     def is_valid_word(self, word, remove_stop_wds):
         is_valid = True
+        word = word.lower()
         stop_wds = set(stopwords.words("english"))
-        if (word in stop_wds and remove_stop_wds) or \
-                re.match(r"<br />", word)  or \
-                re.match(r"[^a-z]", word) or \
-                re.match(r"   ", word):
+        if ((word in stop_wds) and remove_stop_wds) :
+            is_valid = False
+        elif not re.match(r"^[a-z]+$", word):
             is_valid = False
         return is_valid
 
-    def clean_text(self, text, remove_stopwords=True):
-        text_list = word_tokenize(text)
+    def clean_sentence(self, text, remove_stopwords=True):
+        wds_list = word_tokenize(text)
         poter_stemmer = PorterStemmer()
-        text_list = [poter_stemmer.stem(w.lower()) for w in text_list
-                     if self.is_valid_word(w.lower(), remove_stopwords)]
-        text = " ".join(text_list)
-        return text
+        wds_list = [poter_stemmer.stem(w.lower()) for w in wds_list
+                     if self.is_valid_word(w, remove_stopwords)]
+        return wds_list
+
+    def clean_dtset(self, dtframe, sentence_col_name):
+        sentences_list = []
+        for i in range(len(dtframe)):
+            wds_list = self.clean_sentence(dtframe.iloc[i][sentence_col_name])
+            sentences_list.append(wds_list)
+        return sentences_list
+
+    def build_dictionary(self, sentence_list):
+        return corpora.Dictionary(sentence_list)
 
