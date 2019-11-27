@@ -50,3 +50,5 @@ class PopcornHelper():
     def build_dictionary(self, sentence_list):
         return corpora.Dictionary(sentence_list)
 
+    
+
