@@ -23,11 +23,11 @@ class PopcornHelper():
         test_data = self.read_tsv_file(folder_path + "testData.tsv")
         return train_data, test_data
 
-    def is_valid_word(self, word, remove_stop_wds):
+    def is_valid_word(self, word, remove_stopwords):
         is_valid = True
         word = word.lower()
         stop_wds = set(stopwords.words("english"))
-        if ((word in stop_wds) and remove_stop_wds) :
+        if (remove_stopwords and (word in stop_wds)):
             is_valid = False
         elif not re.match(r"^[a-z]+$", word):
             is_valid = False
@@ -40,10 +40,10 @@ class PopcornHelper():
                      if self.is_valid_word(w, remove_stopwords)]
         return wds_list
 
-    def clean_dtset(self, dtframe, sentence_col_name):
+    def clean_dtset(self, dtframe, sentence_col_name, remove_stopwords=True):
         sentences_list = []
         for i in range(len(dtframe)):
-            wds_list = self.clean_sentence(dtframe.iloc[i][sentence_col_name])
+            wds_list = self.clean_sentence(dtframe.iloc[i][sentence_col_name], remove_stopwords)
             sentences_list.append(wds_list)
         return sentences_list
 
