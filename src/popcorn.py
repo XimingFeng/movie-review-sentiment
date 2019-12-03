@@ -6,9 +6,11 @@ from nltk.tokenize import word_tokenize
 from gensim import corpora
 import numpy as np
 import pickle
+import os
+
 
 class PopcornHelper():
-    
+
     def __init__(self, root_directory):
         self.X_train = None
         self.y_train = None
@@ -55,13 +57,14 @@ class PopcornHelper():
 
     def setup_train_test(self):
         train_raw, test_raw = self.load_raw_data()
-        train_doc_cleaned = self.clean_sentence(train_raw)
-        test_doc_cleaned = self.clean_sentence(test_raw)
+        train_doc_cleaned = self.clean_dtset(train_raw, sentence_col_name="review")
+        test_doc_cleaned = self.clean_dtset(test_raw, sentence_col_name="review")
         corpora_dict = self.build_save_dictionary(train_doc_cleaned)
         X_train = self.doc_2_ids(train_doc_cleaned, corpora_dict)
         X_test = self.doc_2_ids(test_doc_cleaned, corpora_dict)
         y_train = np.array(train_raw.sentiment)
         self.dump_cleaned_data((X_train, X_test, y_train))
+        return X_train, X_test, y_train
 
     def dump_cleaned_data(self, dump_obj):
         dump_file_name = self.data_directory + "cleaned_data.pickle"
@@ -75,4 +78,25 @@ class PopcornHelper():
             wd_list = corpora_dict.doc2idx(sentence_list[i])
             doc_ids.append(wd_list)
         return doc_ids
+
+    def get_train_test(self):
+        if not os.path.exists(self.data_directory + "cleaned_data.pickle"):
+            print("Data not cleaned yet. Start to clean up and save cleaned data")
+            X_train, X_test, y_train = self.setup_train_test()
+        else:
+            print("Cleaned data exists, load directly from pickle file")
+            with open(self.data_directory + "cleaned_data.pickle", "rb") as dump_file:
+                X_train, X_test, y_train = pickle.load(dump_file)
+        return X_train, X_test, y_train
+
+    def pad_sequence(self, input_data, max_len):
+        sequence_num = len(input_data)
+        padded_sequence = np.zeros([sequence_num, max_len])
+        for i in range(sequence_num):
+            sequence_len = len(input_data[i])
+            if sequence_len > max_len:
+                padded_sequence[i, :] = input_data[i][: max_len]
+            else:
+                padded_sequence[i, :sequence_len] = input_data[i]
+        return padded_sequence
 
