@@ -14,9 +14,12 @@ class PopcornHelper():
     def __init__(self, root_directory):
         self.X_train = None
         self.y_train = None
-        self.x_test = None
+        self.X_test = None
+        self.corpora_dict = None
         self.root_directory = root_directory
         self.data_directory = root_directory + "/data/"
+
+
     
     def read_tsv_file(self, path):
         return pd.read_csv(path, delimiter="\t")
@@ -52,7 +55,13 @@ class PopcornHelper():
 
     def build_save_dictionary(self, sentence_list):
         corpora_dict = corpora.Dictionary(sentence_list)
+        special_tokens = {
+            "<PADDING>": 0,
+            "<UNKNOWN>": 1
+        }
+        corpora_dict.patch_with_special_tokens(special_tokens)
         corpora_dict.save(self.data_directory + "corpora_dict.dict")
+        self.corpora_dict = corpora_dict
         return corpora_dict
 
     def setup_train_test(self):
@@ -75,7 +84,7 @@ class PopcornHelper():
     def doc_2_ids(self, sentence_list, corpora_dict):
         doc_ids = []
         for i in range(len(sentence_list)):
-            wd_list = corpora_dict.doc2idx(sentence_list[i])
+            wd_list = corpora_dict.doc2idx(sentence_list[i], unknown_word_index=1)
             doc_ids.append(wd_list)
         return doc_ids
 
@@ -83,15 +92,19 @@ class PopcornHelper():
         if not os.path.exists(self.data_directory + "cleaned_data.pickle"):
             print("Data not cleaned yet. Start to clean up and save cleaned data")
             X_train, X_test, y_train = self.setup_train_test()
+
         else:
             print("Cleaned data exists, load directly from pickle file")
             with open(self.data_directory + "cleaned_data.pickle", "rb") as dump_file:
                 X_train, X_test, y_train = pickle.load(dump_file)
+        self.X_train = X_train
+        self.X_test = X_test
+        self.y_train = y_train
         return X_train, X_test, y_train
 
     def pad_sequence(self, input_data, max_len):
         sequence_num = len(input_data)
-        padded_sequence = np.zeros([sequence_num, max_len])
+        padded_sequence = np.zeros([sequence_num, max_len], dtype=np.int32)
         for i in range(sequence_num):
             sequence_len = len(input_data[i])
             if sequence_len > max_len:
