@@ -7,20 +7,22 @@ from gensim import corpora
 import numpy as np
 import pickle
 import os
+from sklearn.model_selection import train_test_split
 
 
 class PopcornHelper():
 
-    def __init__(self, root_directory):
+    def __init__(self, root_directory, batch_size=100):
         self.X_train = None
         self.y_train = None
+        self.X_val = None
+        self.y_val = None
         self.X_test = None
         self.corpora_dict = None
+        self.batch_size = batch_size
         self.root_directory = root_directory
         self.data_directory = root_directory + "/data/"
 
-
-    
     def read_tsv_file(self, path):
         return pd.read_csv(path, delimiter="\t")
     
@@ -88,19 +90,19 @@ class PopcornHelper():
             doc_ids.append(wd_list)
         return doc_ids
 
-    def get_train_test(self):
+    def setup_data(self):
         if not os.path.exists(self.data_directory + "cleaned_data.pickle"):
             print("Data not cleaned yet. Start to clean up and save cleaned data")
             X_train, X_test, y_train = self.setup_train_test()
-
         else:
             print("Cleaned data exists, load directly from pickle file")
             with open(self.data_directory + "cleaned_data.pickle", "rb") as dump_file:
                 X_train, X_test, y_train = pickle.load(dump_file)
+            self.corpora_dict = corpora.Dictionary.load(self.data_directory + "corpora_dict.dict")
         self.X_train = X_train
         self.X_test = X_test
         self.y_train = y_train
-        return X_train, X_test, y_train
+
 
     def pad_sequence(self, input_data, max_len):
         sequence_num = len(input_data)
@@ -112,4 +114,21 @@ class PopcornHelper():
             else:
                 padded_sequence[i, :sequence_len] = input_data[i]
         return padded_sequence
+
+    def pad_train_test(self, max_len):
+        self.X_train = self.pad_sequence(self.X_train, max_len)
+        self.X_test = self.pad_sequence(self.X_test, max_len)
+
+    def set_train_validation(self, val_size=0.25):
+        self.X_train, self.X_val, self.y_train, self.y_val \
+            = train_test_split(self.X_train, self.y_train, test_size=val_size)
+
+    def get_next_batch(self, epoch):
+        train_end = len(self.X_train)
+        batch_start = (self.batch_size * epoch) % train_end
+        batch_end = batch_start + self.batch_size
+        if batch_end > train_end:
+            batch_start = 0
+            batch_end = self.batch_size
+        return self.X_train[batch_start: batch_end, :], self.y_train[batch_start: batch_end]
 
