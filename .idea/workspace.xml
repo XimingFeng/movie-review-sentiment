@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< HEAD
+    <list default="true" id="f99a32d1-7811-429d-9ff2-01a8156d40e6" name="Default" comment="" />
+=======
     <list default="true" id="2acfca8c-9b03-40d6-b365-099ee9c57c59" name="Default" comment="">
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/lstm.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
+>>>>>>> fdaa2266e091d5491be6a404c9ca001f3ed0605c
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -18,8 +22,18 @@
       <file leaf-file-name="popcorn.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/popcorn.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="-409">
               <caret line="60" column="9" lean-forward="false" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
+=======
+<<<<<<< HEAD
+            <state relative-caret-position="271">
+              <caret line="77" column="60" lean-forward="true" selection-start-line="77" selection-start-column="60" selection-end-line="77" selection-end-column="60" />
+=======
+            <state relative-caret-position="472">
+              <caret line="60" column="9" lean-forward="true" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
+>>>>>>> fdaa2266e091d5491be6a404c9ca001f3ed0605c
+>>>>>>> 1355634a4db8b6d99264aabae5c05a84c2707047
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -62,9 +76,17 @@
       </list>
     </option>
   </component>
+<<<<<<< HEAD
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
+=======
   <component name="ProjectFrameBounds">
     <option name="width" value="1280" />
     <option name="height" value="800" />
+>>>>>>> fdaa2266e091d5491be6a404c9ca001f3ed0605c
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -211,7 +233,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
+<<<<<<< HEAD
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
+=======
     <frame x="0" y="0" width="1280" height="800" extended-state="6" />
+>>>>>>> fdaa2266e091d5491be6a404c9ca001f3ed0605c
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15912762" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -352,8 +378,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/popcorn.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="-409">
           <caret line="60" column="9" lean-forward="false" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
+=======
+<<<<<<< HEAD
+        <state relative-caret-position="271">
+          <caret line="77" column="60" lean-forward="true" selection-start-line="77" selection-start-column="60" selection-end-line="77" selection-end-column="60" />
+=======
+        <state relative-caret-position="472">
+          <caret line="60" column="9" lean-forward="true" selection-start-line="60" selection-start-column="9" selection-end-line="60" selection-end-column="9" />
+>>>>>>> fdaa2266e091d5491be6a404c9ca001f3ed0605c
+>>>>>>> 1355634a4db8b6d99264aabae5c05a84c2707047
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
