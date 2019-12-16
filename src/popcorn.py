@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 
 class PopcornHelper():
 
-    def __init__(self, root_directory, batch_size=100):
+    def __init__(self, root_directory, batch_size=100, verbose=True):
         self.X_train = None
         self.y_train = None
         self.X_val = None
@@ -22,6 +22,7 @@ class PopcornHelper():
         self.batch_size = batch_size
         self.root_directory = root_directory
         self.data_directory = root_directory + "/data/"
+        self.verbose = verbose
 
     def read_tsv_file(self, path):
         return pd.read_csv(path, delimiter="\t")
@@ -53,6 +54,8 @@ class PopcornHelper():
         for i in range(len(dtframe)):
             wds_list = self.clean_sentence(dtframe.iloc[i][sentence_col_name], remove_stopwords)
             sentences_list.append(wds_list)
+            if self.verbose and i % 1000 == 0:
+                print("sentence {} cleaned".format(str(i)))
         return sentences_list
 
     def build_save_dictionary(self, sentence_list):
@@ -68,13 +71,25 @@ class PopcornHelper():
 
     def setup_train_test(self):
         train_raw, test_raw = self.load_raw_data()
+        y_train = np.array(train_raw.sentiment)
+        y_train_onehot = np.zeros((y_train.shape[0], 2))
+        y_train_onehot[np.arange(len(y_train)), y_train] = 1
+        if self.verbose:
+            print("Training label ready")
         train_doc_cleaned = self.clean_dtset(train_raw, sentence_col_name="review")
+        if self.verbose:
+            print("Training data cleaned")
         test_doc_cleaned = self.clean_dtset(test_raw, sentence_col_name="review")
+        if self.verbose:
+            print("Testing data cleaned")
         corpora_dict = self.build_save_dictionary(train_doc_cleaned)
+        if self.verbose:
+            print("Dictionary built and saved")
         X_train = self.doc_2_ids(train_doc_cleaned, corpora_dict)
         X_test = self.doc_2_ids(test_doc_cleaned, corpora_dict)
-        y_train = np.array(train_raw.sentiment)
-        self.dump_cleaned_data((X_train, X_test, y_train))
+        if self.verbose:
+            print("Words converted to IDs")
+        self.dump_cleaned_data((X_train, X_test, y_train_onehot))
         return X_train, X_test, y_train
 
     def dump_cleaned_data(self, dump_obj):
@@ -102,7 +117,6 @@ class PopcornHelper():
         self.X_train = X_train
         self.X_test = X_test
         self.y_train = y_train
-
 
     def pad_sequence(self, input_data, max_len):
         sequence_num = len(input_data)
