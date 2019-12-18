@@ -27,7 +27,7 @@ class lstm_classifier():
         self.keep_prob = None
         self.wd_dict_size = len(self.data_helper.corpora_dict)
         self.sess = tf.Session()
-        if not os.path.exists(self.model_dir):
+        if not os.path.exists(self.model_dir+"basic_lstm.meta"):
             print("No meta graph found. Start to build graph from scratch")
             self.initialize_graph()
             print("Graph built successfully!")
@@ -68,8 +68,8 @@ class lstm_classifier():
         with tf.name_scope("accuracy"):
             matches = tf.equal(tf.argmax(scores, axis=1), tf.argmax(self.y_true, axis=1))
             self.accuracy = tf.reduce_mean(tf.cast(matches, tf.float32), name="accuracy")
-
         self.sess.run(tf.global_variables_initializer())
+        tf.add_to_collection("train", self.train)
 
     def setup_data(self, batch_size):
         self.data_helper = PopcornHelper(self.root_dir, batch_size=batch_size)
@@ -81,7 +81,7 @@ class lstm_classifier():
 
         X_val = self.data_helper.X_val
         y_val = self.data_helper.y_val
-
+        max_acc = 0.0
         for i in range(epochs):
             X_train_batch, y_train_batch = self.data_helper.get_next_batch(i)
             for j in range(steps):
@@ -92,13 +92,18 @@ class lstm_classifier():
                                                          self.keep_prob: 0.8})
                 if self.verbose:
                     print("Training loss: {}, accuracy: {}".format(str(loss_val), str(accuracy_val)))
-            if i % verbose_every == 0:
-                acc = self.sess.run(self.accuracy, feed_dict={self.X: X_val, self.y_true: y_val, self.keep_prob: 1.0})
+
+            acc = self.sess.run(self.accuracy, feed_dict={self.X: X_val, self.y_true: y_val, self.keep_prob: 1.0})
+            if acc > max_acc:
+                self.save_model(self.sess, epochs)
+                max_acc = acc
+                if self.verbose:
+                    print("Better accuracy found. LSTM model saved")
+            if self.verbose:
                 print("----------------- Step {}: validation accuracy {} ----------------".format(str(i), str(acc)))
-            else:
-                print("-----------------------------------------------------------------")
-            self.save_model(self.sess, epochs)
-            print("LSTM model saved in model folder under root directory")
+
+
+
 
     def save_model(self, sess, final_epoch):
         saver = tf.train.Saver()
@@ -111,5 +116,6 @@ class lstm_classifier():
         self.y_true = self.graph.get_tensor_by_name("input/y_true:0")
         self.keep_prob = self.graph.get_tensor_by_name("input/keep_prob:0")
         self.loss = self.graph.get_tensor_by_name("cross_entropy/loss:0")
-        self.train = self.graph.get_tensor_by_name("train/train:0")
         self.accuracy = self.graph.get_tensor_by_name("accuracy/accuracy: 0")
+        self.train = tf.get_collection("train")[0]
+
