@@ -102,11 +102,8 @@ class lstm_classifier():
             if self.verbose:
                 print("----------------- Step {}: validation accuracy {} ----------------".format(str(i), str(acc)))
 
-
-
-
     def save_model(self, sess, final_epoch):
-        saver = tf.train.Saver()
+        saver = tf.train.Saver(save_relative_paths=True)
         saver.save(sess, self.model_dir + "basic_lstm")
 
     def restore_model(self):
