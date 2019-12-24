@@ -135,12 +135,9 @@ class lstm_classifier():
             # else:
             #     print("-----------------------------------------------------")
 
-<<<<<<< HEAD
     def save_model(self, sess, final_epoch):
         saver = tf.train.Saver(save_relative_paths=True)
         saver.save(sess, self.model_dir + "basic_lstm")
-=======
-
 
     def save_model(self, sess):
         saver = tf.train.Saver(save_relative_paths=True)
@@ -148,7 +145,6 @@ class lstm_classifier():
             save_meta = True
         else: save_meta = False
         saver.save(sess, self.model_dir + "basic_lstm", write_meta_graph=save_meta)
->>>>>>> 8205a0fc3c63fef818a4c36f3f29bebe675268be
 
     def restore_model(self):
         saver = tf.train.import_meta_graph(self.model_dir+"basic_lstm.meta")
