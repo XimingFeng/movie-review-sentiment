@@ -98,8 +98,6 @@ class lstm_classifier():
         self.sess.run(tf.global_variables_initializer())
         tf.add_to_collection("train", self.train)
 
-
-
     def setup_data(self, batch_size):
         self.data_helper = PopcornHelper(self.root_dir, batch_size=batch_size)
         self.data_helper.setup_data()
@@ -132,12 +130,16 @@ class lstm_classifier():
                     if self.verbose:
                         print("Better accuracy found. LSTM model saved")
                 print("----------------- Step {}: validation accuracy {} ----------------".format(str(i), str(acc)))
+<<<<<<< HEAD
             # else:
             #     print("-----------------------------------------------------")
 
     def save_model(self, sess, final_epoch):
         saver = tf.train.Saver(save_relative_paths=True)
         saver.save(sess, self.model_dir + "basic_lstm")
+=======
+
+>>>>>>> 5a435f7f10d8bd9407996a19442481c9337c408e
 
     def save_model(self, sess):
         saver = tf.train.Saver(save_relative_paths=True)
@@ -161,25 +163,10 @@ class lstm_classifier():
         self.train = tf.get_collection("train")[0]
 
     def predict(self, raw_text):
-        # x_b, _ = self.data_helper.get_next_batch(0)
-        # x_second = x_b[0: 3, :]
-        # x_third = x_b[0, :].reshape([1, -1])
-        # print(x_second.dtype)
-        # print()
-        # print( x_third.dtype)
-        # print(self.data_helper.X_train.shape)
-        # self.restore_model()
         wd_list = self.data_helper.clean_sentence(raw_text)
         # print("cleaned words list: ", wd_list)
         wd_id_list = self.data_helper.corpora_dict.doc2idx(wd_list)
         wd_id_padded = self.data_helper.pad_sequence([wd_id_list], self.num_wds)
-        # wd_id_padded_batch = np.stack([wd_id_padded for _ in range(64)]).reshape([64, 200])
-        # print("What is sent to tf", wd_id_padded)
-        # x_first = np.reshape(x_b[0, :], [1, 200])
-        # print(wd_id_padded_batch.dtype, x_b.dtype)
-        # print(type(wd_id_padded_batch), type(x_b))
-        # print(wd_id_padded_batch.shape, x_b.shape)
-
         confidence_val = self.sess.run( self.confidence,
                                         feed_dict={self.X: wd_id_padded,
                                                    self.keep_prob: 1.0,
