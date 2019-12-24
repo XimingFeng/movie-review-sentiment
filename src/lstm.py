@@ -130,16 +130,11 @@ class lstm_classifier():
                     if self.verbose:
                         print("Better accuracy found. LSTM model saved")
                 print("----------------- Step {}: validation accuracy {} ----------------".format(str(i), str(acc)))
-<<<<<<< HEAD
-            # else:
-            #     print("-----------------------------------------------------")
 
     def save_model(self, sess, final_epoch):
         saver = tf.train.Saver(save_relative_paths=True)
         saver.save(sess, self.model_dir + "basic_lstm")
-=======
 
->>>>>>> 5a435f7f10d8bd9407996a19442481c9337c408e
 
     def save_model(self, sess):
         saver = tf.train.Saver(save_relative_paths=True)
