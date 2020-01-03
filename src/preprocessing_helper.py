@@ -1,5 +1,5 @@
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 import pandas as pd
 import re
 from sklearn.model_selection import train_test_split
@@ -10,10 +10,11 @@ import pickle
 
 class PreprocessingHelper():
 
-    def __init__(self, root_dir, max_doc_len, verbose=True):
+    def __init__(self, root_dir, max_doc_len, vocab_size, verbose=True):
         self.root_dir = root_dir
         self.data_directory = root_dir + "/data/"
         self.max_doc_len = max_doc_len
+        self.vocab_size = vocab_size
         self.verbose = verbose
 
         if os.path.exists(self.data_directory + "preprocessed_data.pickle"):
@@ -33,7 +34,7 @@ class PreprocessingHelper():
 
 
     def setup_raw_data(self):
-        tokenizer = Tokenizer(oov_token="<UNKNOWN>")
+        tokenizer = Tokenizer(oov_token="<UNKNOWN>", num_words=self.vocab_size)
         train_raw, test_raw = self.load_raw_data()
         train_raw_list = train_raw["review"].to_list()
         test_raw_list = test_raw["review"].to_list()
@@ -75,4 +76,13 @@ class PreprocessingHelper():
             print("data loaded from file")
         return train_raw, test_raw
 
+    def train_batch_generator(self, batch_size):
+        start_idx = 0
+        while True:
+            end_idx = start_idx + batch_size
+            if end_idx > len(self.X_train):
+                start_idx = 0
+                end_idx = batch_size
+            yield self.X_train[start_idx: end_idx, :], self.y_train[start_idx: end_idx]
+            start_idx += batch_size
 
