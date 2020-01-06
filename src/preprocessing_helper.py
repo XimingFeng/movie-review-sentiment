@@ -86,3 +86,12 @@ class PreprocessingHelper():
             yield self.X_train[start_idx: end_idx, :], self.y_train[start_idx: end_idx]
             start_idx += batch_size
 
+    def validation_batch_generator(self, batch_size):
+        start_idx = 0
+        while True:
+            end_idx = start_idx + batch_size
+            if end_idx > len(self.X_val):
+                start_idx = 0
+                end_idx = batch_size
+            yield self.X_val[start_idx: end_idx, :], self.y_val[start_idx: end_idx]
+            start_idx += batch_size
