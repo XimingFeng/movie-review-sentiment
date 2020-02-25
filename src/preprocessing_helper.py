@@ -16,7 +16,7 @@ class PreprocessingHelper():
         self.max_doc_len = max_doc_len
         self.vocab_size = vocab_size
         self.verbose = verbose
-
+        self.tokenizer = None
         if os.path.exists(self.data_directory + "preprocessed_data.pickle"):
             with open(self.data_directory + "preprocessed_data.pickle", "rb") as pickle_file:
                 self.X_train, self.y_train, self.X_val, self.y_val, self.X_test, self.tokenizer = pickle.load(pickle_file)
@@ -51,7 +51,7 @@ class PreprocessingHelper():
         X_test = pad_sequences(test_ids, maxlen=self.max_doc_len, padding="post")
         y_train = np.array(train_raw["sentiment"].to_list(), dtype=np.int32)
         X_train, X_val, y_train, y_val = \
-            train_test_split(X_train, y_train, test_size=0.2, random_state=66)
+            train_test_split(X_train, y_train, test_size=0.001, random_state=66)
 
         with open(self.data_directory + "preprocessed_data.pickle", "wb") as pickle_file:
             pickle.dump([X_train, y_train, X_val, y_val, X_test, tokenizer], pickle_file)

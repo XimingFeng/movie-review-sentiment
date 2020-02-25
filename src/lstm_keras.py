@@ -1,64 +1,112 @@
 from tensorflow.keras.models import Sequential, model_from_json
 from tensorflow.keras.layers import Dense, LSTM, Embedding, Dropout, BatchNormalization, Flatten
 from tensorflow.keras.optimizers import Adam
-from datetime import datetime
-
+from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
+from time import time
+import os
+import json
 
 class ModelLSTM():
-    def __init__(self, lstm_units, embedding_size, doc_len, dense_units, vocab_size, drop_rate, lr, root_dir):
-        self.lstm_units = lstm_units
-        self.embedding_size = embedding_size
-        self.dense_units = dense_units
-        self.vocab_size = vocab_size
-        self.drop_rate = drop_rate
-        self.learning_rate = lr
-        self.doc_len = doc_len
-        self.model = self.build_graph()
-        self.train_history = None
+    def __init__(self, root_dir, graph_config, verbose=True):
+        self.verbose = verbose
         self.root_dir = root_dir
         self.model_dir = root_dir + "/model/basic_lstm/"
+        self.graph_config_path = self.model_dir + "graph_configs.json"
+
+        self.log_path = self.model_dir + "logs"
+        self.model = None
+        self.history = None
+        self.graph_config = graph_config
+        self.config_id, found_exist = self.get_graph_config_id(self.graph_config)
+        if self.verbose:
+            if found_exist:
+                print("Found matching configuration with id: {}".format(self.config_id))
+            else:
+                print("No matching configuration, save new config with id: {}".format(self.config_id))
+        self.weight_path = self.model_dir + "model_" + str(self.config_id) + "_weights.h5"
+
+        if found_exist:
+            self.model = self.load_graph(self.config_id)
+            self.load_exist_weight()
+        else:
+            self.model = self.build_graph(self.graph_config, self.config_id)
+        print(self.model.summary())
+        self.log_path = self.model_dir + "log/" + str(self.config_id)
 
 
-    def build_graph(self):
-        model = Sequential()
-        model.add(Embedding(input_dim=self.vocab_size, output_dim=self.embedding_size, input_length=self.doc_len))
-        model.add(LSTM(units=self.lstm_units, return_sequences=False))
-        for i in self.dense_units:
-            model.add(Dense(units=i, activation="relu"))
-            model.add(BatchNormalization())
-        # model.add(Dropout(rate=self.drop_rate))
-        model.add(Dense(units=1, activation="sigmoid"))
-        Adam_optimier = Adam(learning_rate=self.learning_rate)
-        model.compile(loss="binary_crossentropy", optimizer=Adam_optimier, metrics=["accuracy"])
-        print(model.summary())
+    def get_graph_config_id(self, config):
+        config_id = 0
+        found_existing = False
+        config_list = []
+        if os.path.exists(self.graph_config_path):
+            with open(self.graph_config_path, 'r') as json_file:
+                config_list = json.load(json_file)
+            for i in range(len(config_list)):
+                if self.graph_config == config_list[i]:
+                    found_existing = True
+                    config_id = i
+                    break
+        if not found_existing:
+            config_list.append(self.graph_config)
+            config_id = len(config_list) - 1
+            with open(self.graph_config_path, 'w') as json_file:
+                json.dump(config_list, json_file)
+        return config_id, found_existing
+
+    def build_graph(self, config_dict, config_id):
+        lstm_units = config_dict["lstm_units"]
+        embedding_size = config_dict["embedding_size"]
+        dense_units = config_dict["dense_units"]
+        vocab_size = config_dict["vocab_size"]
+        doc_len = config_dict["doc_len"]
+        model_layers = []
+        model_layers.append(Embedding(input_dim=vocab_size, output_dim=embedding_size, input_length=doc_len))
+        model_layers.append(LSTM(units=lstm_units, input_shape=(doc_len, embedding_size), return_sequences=False))
+        for i in dense_units:
+            model_layers.append(Dense(units=i, activation="relu"))
+            model_layers.append(BatchNormalization())
+        model_layers.append(Dense(units=1, activation="sigmoid"))
+        model = Sequential(model_layers)
+        model_json = model.to_json()
+        with open(self.model_dir + "graph_" + str(config_id) + ".json", 'w') as json_file:
+            json_file.write(model_json)
         return model
 
-    def train(self, data_generator, batch_size, steps_per_epoch, epochs, val_generator):
-        self.train_history = self.model.fit_generator(data_generator(batch_size),
-                                                      validation_data=val_generator,
-                                                      steps_per_epoch=steps_per_epoch,
-                                                      epochs=epochs)
+    def load_graph(self, config_id):
+        with open(self.model_dir + "graph_" + str(config_id) + ".json", 'r') as json_file:
+            model_json = json_file.read()
+        model = model_from_json(model_json)
+        return model
 
-    def save_model(self):
-        model_json = self.model.to_json()
-        time_str = datetime.now().strftime("LSTM Keras %m-%d-%Y %H-%M")
-        model_file_name = time_str + ".json"
-        weights_file_name = time_str + ".h5"
-        with open(self.model_dir + model_file_name, "w") as model_file:
-            model_file.write(model_json)
+    def load_exist_weight(self):
+        for file in os.listdir(self.model_dir):
+            if file == "model_" + str(self.config_id) + "_weights.h5":
+                self.model.load_weights(self.weight_path)
+                if self.verbose:
+                    print("Found existing trained weights, loaded to model")
+                break
 
-        self.model.save_weights(self.model_dir + weights_file_name)
-
-    def load_model(self, save_time):
-        with open(self.model_dir + "LSTM Keras " + save_time + ".json", "r") as model_file:
-            model_json = model_file.read()
-        self.model = model_from_json(model_json)
-        self.model.load_weights(self.model_dir + "LSTM Keras " + save_time + ".h5")
-        Adam_optimier = Adam(learning_rate=self.learning_rate)
-        self.model.compile(loss="binary_crossentropy", optimizer=Adam_optimier, metrics=["accuracy"])
-        print(self.model.summary())
-
-
-
-
-
+    def train(self, train_generator, train_config):
+        steps_p_epoch = train_config["steps_p_epoch"]
+        eps = train_config["eps"]
+        val_data = train_config["val_data"]
+        val_freq = train_config["val_freq"]
+        verbose = train_config["verbose"]
+        lr = train_config["lr"]
+        adam_optimizer = Adam(learning_rate=lr)
+        self.model.compile(loss="binary_crossentropy", optimizer=adam_optimizer, metrics=["accuracy"])
+        check_point = ModelCheckpoint(filepath=self.weight_path,
+                                      monitor="val_acc",
+                                      verbose=False,
+                                      save_best_only=True,
+                                      save_weights_only=True,
+                                      mode="max")
+        tensorboard = TensorBoard(self.log_path)
+        history = self.model.fit_generator(generator=train_generator,
+                                            steps_per_epoch=steps_p_epoch,
+                                            epochs=eps,
+                                            validation_data=val_data,
+                                            validation_freq=val_freq,
+                                            verbose=verbose,
+                                            callbacks=[check_point, tensorboard])
+        return history
