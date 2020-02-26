@@ -9,8 +9,21 @@ import pickle
 
 
 class PreprocessingHelper():
+    """
+    This class is used to handle data pre-processing
+    """
 
     def __init__(self, root_dir, max_doc_len, vocab_size, verbose=True):
+        """
+        Constructor for preprocessing helper
+
+        :param root_dir: root directory for the project
+        :param max_doc_len: maximum of the length of each review measured by number of words
+        :param vocab_size: the size of total vocabulary
+        :param verbose: if print out vocabulary
+        :return:
+        """
+
         self.root_dir = root_dir
         self.data_directory = root_dir + "/data/"
         self.max_doc_len = max_doc_len
