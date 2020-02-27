@@ -1,5 +1,5 @@
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.python.keras.preprocessing.text import Tokenizer
+from tensorflow.python.keras.preprocessing.sequence import pad_sequences
 import pandas as pd
 import re
 from sklearn.model_selection import train_test_split
@@ -8,70 +8,52 @@ import os
 import pickle
 
 
-class PreprocessingHelper():
+class PreProcessingHelper:
     """
     This class is used to handle data pre-processing
     """
 
-    def __init__(self, root_dir, max_doc_len, vocab_size, verbose=True):
+    def setup_tokenizer(self, cleaned_corpus, vocab_size, save_tokenizer=False, file_path=None):
         """
-        Constructor for preprocessing helper
+        Construct tokenizer based on cleaned corpus
 
-        :param root_dir: root directory for the project
-        :param max_doc_len: maximum of the length of each review measured by number of words
-        :param vocab_size: the size of total vocabulary
-        :param verbose: if print out vocabulary
-        :return:
+        :param list cleaned_corpus: a list of documents (str). see function clean_docs for cleaning method
+        :param int vocab_size: the size of vocabulary
+        :param bool save_tokenizer: if tokenizer is going to be saved in a pickle file
+        :param str file_path: specify the file path where tokenizer is going to be saved
+        :return: constructed tokenizer
         """
+        tokenizer = Tokenizer(oov_token="<UNKNOWN>", num_words=vocab_size)
+        tokenizer.fit_on_texts(cleaned_corpus)
+        if save_tokenizer:
+            with open(file_path, 'wb') as pickle_file:
+                pickle.dump(tokenizer, pickle_file)
+        return tokenizer
 
-        self.root_dir = root_dir
-        self.data_directory = root_dir + "/data/"
-        self.max_doc_len = max_doc_len
-        self.vocab_size = vocab_size
-        self.verbose = verbose
-        self.tokenizer = None
-        if os.path.exists(self.data_directory + "preprocessed_data.pickle"):
-            with open(self.data_directory + "preprocessed_data.pickle", "rb") as pickle_file:
-                self.X_train, self.y_train, self.X_val, self.y_val, self.X_test, self.tokenizer = pickle.load(pickle_file)
-                if verbose:
-                    print("preprocessed data loaded from " + self.data_directory + "preprocessed_data.pickle")
-        else:
-            self.X_train, self.y_train, self.X_val, self.y_val, self.X_test, self.tokenizer = self.setup_raw_data()
+    def get_tokenizer(self, file_path):
+        """
+        Get tokenizer from pickle file
 
-        if self.verbose:
-            print("Training data: {}".format(self.X_train.shape))
-            print("Training label: {}".format(self.y_train.shape))
-            print("Validation data: {}".format(self.X_val.shape))
-            print("Validation lable: {}".format(self.y_val.shape))
-            print("Test set {}".format(self.X_test.shape))
-
-
-    def setup_raw_data(self):
-        tokenizer = Tokenizer(oov_token="<UNKNOWN>", num_words=self.vocab_size)
-        train_raw, test_raw = self.load_raw_data()
-        train_raw_list = train_raw["review"].to_list()
-        test_raw_list = test_raw["review"].to_list()
-        train_cleaned = self.clean_docs(train_raw_list)
-        test_cleaned = self.clean_docs(test_raw_list)
-        if self.verbose:
-            print("raw text cleaned")
-        tokenizer.fit_on_texts(train_cleaned)
-        if self.verbose:
-            print("dict built from training")
-        train_ids = tokenizer.texts_to_sequences(train_cleaned)
-        test_ids = tokenizer.texts_to_sequences(test_cleaned)
-        X_train = pad_sequences(train_ids, maxlen=self.max_doc_len, padding="post")
-        X_test = pad_sequences(test_ids, maxlen=self.max_doc_len, padding="post")
-        y_train = np.array(train_raw["sentiment"].to_list(), dtype=np.int32)
-        X_train, X_val, y_train, y_val = \
-            train_test_split(X_train, y_train, test_size=0.001, random_state=66)
-
-        with open(self.data_directory + "preprocessed_data.pickle", "wb") as pickle_file:
-            pickle.dump([X_train, y_train, X_val, y_val, X_test, tokenizer], pickle_file)
-        print("preprocessed data dumped into pickle file!")
-        return X_train, y_train, X_val, y_val, X_test, tokenizer
+        :param file_path: path to pickle file
+        :return: tokenizer, None if there is no file saved
+        """
+        tokenizer = None
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as pickle_file:
+                tokenizer = pickle.load(pickle_file)
+        return tokenizer
 
     def clean_docs(self, doc_list_raw):
+        """
+        Clean raw corpus, clean up items include:
+
+        1. lower case all words
+        2. allow only alphabetical letters
+        3. remove extra space
+
+        :param doc_list_raw: list raw documents (str)
+        :return: cleaned corpus
+        """
         doc_list_cleaned = doc_list_raw.copy()
         for idx, doc_text in enumerate(doc_list_raw):
             doc_text = doc_text.lower()
@@ -82,12 +64,20 @@ class PreprocessingHelper():
             doc_list_cleaned[idx] = doc_text
         return doc_list_cleaned
 
-    def load_raw_data(self):
-        train_raw = pd.read_csv(self.data_directory + "labeledTrainData.tsv", delimiter="\t")
-        test_raw = pd.read_csv(self.data_directory + "testData.tsv", delimiter="\t")
-        if self.verbose:
-            print("data loaded from file")
-        return train_raw, test_raw
+    def clean_corpus_to_ids(self, clean_corpus, tokenizer, max_len):
+        ids = tokenizer.texts_to_sequences(clean_corpus)
+        ids_pad = pad_sequences(ids, max_len, padding="post")
+        return ids_pad
+
+    def save_train_val_test(self, data_list, file_path):
+        with open(file_path, "wb") as pickle_file:
+            pickle.dump(data_list, pickle_file)
+        print("preprocessed data dumped into pickle file!")
+
+    def get_train_val_test(self, file_path):
+        with open(file_path, "rb") as pickle_file:
+            preprocessed_data = pickle.load(pickle_file)
+        return preprocessed_data
 
     def train_batch_generator(self, batch_size):
         start_idx = 0

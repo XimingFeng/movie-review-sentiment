@@ -4,4 +4,7 @@ src
 .. toctree::
    :maxdepth: 4
 
-   src
+   lstm
+   lstm_keras
+   popcorn
+   preprocessing_helper
