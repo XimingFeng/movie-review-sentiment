@@ -65,21 +65,52 @@ class PreProcessingHelper:
         return doc_list_cleaned
 
     def clean_corpus_to_ids(self, clean_corpus, tokenizer, max_len):
+        """
+        convert cleaned corpus to word ids
+
+        :param list(str) clean_corpus: cleaned corpus
+        :param tokenizer: tokenizer
+        :param int max_len: max length of word for each documents
+        :return: numpy array with shape (len(clean_corpus), max_len)
+        """
         ids = tokenizer.texts_to_sequences(clean_corpus)
         ids_pad = pad_sequences(ids, max_len, padding="post")
         return ids_pad
 
     def save_train_val_test(self, data_list, file_path):
+        """
+        save preprocessed data into a pickle file
+
+        :param data_list: [X_train, y_train, X_val, y_val, X_test]
+        :param file_path: path to the pickle file
+        """
+
         with open(file_path, "wb") as pickle_file:
             pickle.dump(data_list, pickle_file)
         print("preprocessed data dumped into pickle file!")
 
     def get_train_val_test(self, file_path):
-        with open(file_path, "rb") as pickle_file:
-            preprocessed_data = pickle.load(pickle_file)
+        """
+        Get preprocessed data from pickle file
+
+        :param str file_path: path to pickle file
+        :return list: list of preprocessed data [X_train, y_train, X_val, y_val, X_test]
+        """
+
+        preprocessed_data = None
+        if os.path.exists(file_path):
+            with open(file_path, "rb") as pickle_file:
+                preprocessed_data = pickle.load(pickle_file)
         return preprocessed_data
 
     def train_batch_generator(self, batch_size):
+        """
+        Generator for training batch, once it reach the end of training set, start over again
+
+        :param int batch_size: size of batch
+        :return: training batch (yield)
+        """
+
         start_idx = 0
         while True:
             end_idx = start_idx + batch_size
@@ -90,6 +121,13 @@ class PreProcessingHelper:
             start_idx += batch_size
 
     def validation_batch_generator(self, batch_size):
+        """
+        Generator for validation batch, once it reach the end of validation set, start over again
+
+        :param int batch_size: size of batch
+        :return: validation batch (yield)
+        """
+
         start_idx = 0
         while True:
             end_idx = start_idx + batch_size

@@ -164,7 +164,20 @@
 <dl class="method">
 <dt id="preprocessing_helper.PreProcessingHelper.clean_corpus_to_ids">
 <code class="sig-name descname">clean_corpus_to_ids</code><span class="sig-paren">(</span><em class="sig-param">clean_corpus</em>, <em class="sig-param">tokenizer</em>, <em class="sig-param">max_len</em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing_helper.PreProcessingHelper.clean_corpus_to_ids" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>convert cleaned corpus to word ids</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clean_corpus</strong> (<em>list</em><em>(</em><em>str</em><em>)</em>) – cleaned corpus</p></li>
+<li><p><strong>tokenizer</strong> – tokenizer</p></li>
+<li><p><strong>max_len</strong> (<em>int</em>) – max length of word for each documents</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>numpy array with shape (len(clean_corpus), max_len)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="preprocessing_helper.PreProcessingHelper.clean_docs">
@@ -202,12 +215,30 @@
 <dl class="method">
 <dt id="preprocessing_helper.PreProcessingHelper.get_train_val_test">
 <code class="sig-name descname">get_train_val_test</code><span class="sig-paren">(</span><em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing_helper.PreProcessingHelper.get_train_val_test" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get preprocessed data from pickle file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – path to pickle file</p>
+</dd>
+<dt class="field-even">Return list</dt>
+<dd class="field-even"><p>list of preprocessed data [X_train, y_train, X_val, y_val, X_test]</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="preprocessing_helper.PreProcessingHelper.save_train_val_test">
 <code class="sig-name descname">save_train_val_test</code><span class="sig-paren">(</span><em class="sig-param">data_list</em>, <em class="sig-param">file_path</em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing_helper.PreProcessingHelper.save_train_val_test" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>save preprocessed data into a pickle file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_list</strong> – [X_train, y_train, X_val, y_val, X_test]</p></li>
+<li><p><strong>file_path</strong> – path to the pickle file</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="preprocessing_helper.PreProcessingHelper.setup_tokenizer">
@@ -231,12 +262,30 @@
 <dl class="method">
 <dt id="preprocessing_helper.PreProcessingHelper.train_batch_generator">
 <code class="sig-name descname">train_batch_generator</code><span class="sig-paren">(</span><em class="sig-param">batch_size</em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing_helper.PreProcessingHelper.train_batch_generator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Generator for training batch, once it reach the end of training set, start over again</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_size</strong> (<em>int</em>) – size of batch</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>training batch (yield)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="preprocessing_helper.PreProcessingHelper.validation_batch_generator">
 <code class="sig-name descname">validation_batch_generator</code><span class="sig-paren">(</span><em class="sig-param">batch_size</em><span class="sig-paren">)</span><a class="headerlink" href="#preprocessing_helper.PreProcessingHelper.validation_batch_generator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Generator for validation batch, once it reach the end of validation set, start over again</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_size</strong> (<em>int</em>) – size of batch</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>validation batch (yield)</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
