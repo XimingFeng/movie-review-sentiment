@@ -1,16 +1,42 @@
-from tensorflow.keras.models import Sequential, model_from_json
-from tensorflow.keras.layers import Dense, LSTM, Embedding, Dropout, BatchNormalization, Flatten
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
-from time import time
+from tensorflow.python.keras.models import Sequential, model_from_json
+from tensorflow.python.keras.layers import Dense, LSTM, Embedding, BatchNormalization
+from tensorflow.python.keras.optimizers import Adam
+from tensorflow.python.keras.callbacks import ModelCheckpoint, TensorBoard
 import os
 import json
 
-class ModelLSTM():
-    def __init__(self, root_dir, graph_config, verbose=True):
+
+class ModelLSTM:
+
+    def __init__(self, model_dir, graph_config, verbose=True):
+        """ Build a Keras sequential model
+
+        The model will contain the following layers
+
+        embeddings -> LSTM -> n * fully connected -> output (1 unit)
+
+        The information of all the graph configuration is saved in
+
+        ../../model/lstm_keras/graph_configs.json.
+
+        They are in a list that look like [graph1_config, graph2_config, ...]. The list index of a graph is its id.
+
+        * The actual graph is saved with the naming convention: graph_(graph id).json.
+        * If the model has been trained, the weight with best result is saved with naming convention:
+          (config id)_weights.h5
+
+        The constructor will check if there is the same configuration in saved config as graph_config parameter.
+        If yes, load from exist and load weight if there is trained weights.
+        If no, build from scratch.
+
+        :param str model_dir: directory for saved models the their config information
+        :param dict graph_config: This is a dictionary that has the graph configuration information
+          the key includes "vocab_size", "doc_len", "lstm_units", "embedding_size", "dense_units"
+        :param bool verbose: whether print out the the verbose
+        """
         self.verbose = verbose
-        self.root_dir = root_dir
-        self.model_dir = root_dir + "/model/basic_lstm/"
+
+        self.model_dir = model_dir
         self.graph_config_path = self.model_dir + "graph_configs.json"
 
         self.log_path = self.model_dir + "logs"
@@ -33,8 +59,7 @@ class ModelLSTM():
         print(self.model.summary())
         self.log_path = self.model_dir + "log/" + str(self.config_id)
 
-
-    def get_graph_config_id(self, config):
+    def get_graph_config_id(self):
         config_id = 0
         found_existing = False
         config_list = []

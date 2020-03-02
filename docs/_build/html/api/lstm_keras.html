@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="popcorn module" href="popcorn.html" />
-    <link rel="prev" title="lstm module" href="lstm.html" /> 
+    <link rel="next" title="preprocessing_helper module" href="preprocessing_helper.html" />
+    <link rel="prev" title="src" href="modules.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,9 +83,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="lstm.html">lstm module</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">lstm_keras module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="popcorn.html">popcorn module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="preprocessing_helper.html">preprocessing_helper module</a></li>
 </ul>
 </li>
@@ -159,8 +157,32 @@
 <span id="lstm-keras-module"></span><h1>lstm_keras module<a class="headerlink" href="#module-lstm_keras" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lstm_keras.ModelLSTM">
-<em class="property">class </em><code class="sig-prename descclassname">lstm_keras.</code><code class="sig-name descname">ModelLSTM</code><span class="sig-paren">(</span><em class="sig-param">root_dir</em>, <em class="sig-param">graph_config</em>, <em class="sig-param">verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lstm_keras.</code><code class="sig-name descname">ModelLSTM</code><span class="sig-paren">(</span><em class="sig-param">model_dir</em>, <em class="sig-param">graph_config</em>, <em class="sig-param">verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Build a Keras sequential model</p>
+<p>The model will contain the following layers</p>
+<p>embeddings -&gt; LSTM -&gt; n * fully connected -&gt; output (1 unit)</p>
+<p>The information of all the graph configuration is saved in</p>
+<p>../../model/lstm_keras/graph_configs.json.</p>
+<p>They are in a list that look like [graph1_config, graph2_config, …]. The list index of a graph is its id.</p>
+<ul class="simple">
+<li><p>The actual graph is saved with the naming convention: graph_(graph id).json.</p></li>
+<li><p>If the model has been trained, the weight with best result is saved with naming convention:
+(config id)_weights.h5</p></li>
+</ul>
+<p>The constructor will check if there is the same configuration in saved config as graph_config parameter.
+If yes, load from exist and load weight if there is trained weights.
+If no, build from scratch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_dir</strong> (<em>str</em>) – directory for saved models the their config information</p></li>
+<li><p><strong>graph_config</strong> (<em>dict</em>) – This is a dictionary that has the graph configuration information
+the key includes “vocab_size”, “doc_len”, “lstm_units”, “embedding_size”, “dense_units”</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – whether print out the the verbose</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
 <dt id="lstm_keras.ModelLSTM.build_graph">
 <code class="sig-name descname">build_graph</code><span class="sig-paren">(</span><em class="sig-param">config_dict</em>, <em class="sig-param">config_id</em><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.build_graph" title="Permalink to this definition">¶</a></dt>
@@ -168,7 +190,7 @@
 
 <dl class="method">
 <dt id="lstm_keras.ModelLSTM.get_graph_config_id">
-<code class="sig-name descname">get_graph_config_id</code><span class="sig-paren">(</span><em class="sig-param">config</em><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.get_graph_config_id" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_graph_config_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.get_graph_config_id" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -198,10 +220,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="popcorn.html" class="btn btn-neutral float-right" title="popcorn module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="preprocessing_helper.html" class="btn btn-neutral float-right" title="preprocessing_helper module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="lstm.html" class="btn btn-neutral float-left" title="lstm module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-left" title="src" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

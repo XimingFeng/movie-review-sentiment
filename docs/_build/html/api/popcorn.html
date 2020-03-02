@@ -155,84 +155,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-popcorn">
-<span id="popcorn-module"></span><h1>popcorn module<a class="headerlink" href="#module-popcorn" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="popcorn.PopcornHelper">
-<em class="property">class </em><code class="sig-prename descclassname">popcorn.</code><code class="sig-name descname">PopcornHelper</code><span class="sig-paren">(</span><em class="sig-param">root_directory</em>, <em class="sig-param">batch_size=100</em>, <em class="sig-param">verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="popcorn.PopcornHelper.build_save_dictionary">
-<code class="sig-name descname">build_save_dictionary</code><span class="sig-paren">(</span><em class="sig-param">sentence_list</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.build_save_dictionary" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.clean_dtset">
-<code class="sig-name descname">clean_dtset</code><span class="sig-paren">(</span><em class="sig-param">dtframe</em>, <em class="sig-param">sentence_col_name</em>, <em class="sig-param">remove_stopwords=True</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.clean_dtset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.clean_sentence">
-<code class="sig-name descname">clean_sentence</code><span class="sig-paren">(</span><em class="sig-param">text</em>, <em class="sig-param">remove_stopwords=True</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.clean_sentence" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.doc_2_ids">
-<code class="sig-name descname">doc_2_ids</code><span class="sig-paren">(</span><em class="sig-param">sentence_list</em>, <em class="sig-param">corpora_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.doc_2_ids" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.dump_cleaned_data">
-<code class="sig-name descname">dump_cleaned_data</code><span class="sig-paren">(</span><em class="sig-param">dump_obj</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.dump_cleaned_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.get_next_batch">
-<code class="sig-name descname">get_next_batch</code><span class="sig-paren">(</span><em class="sig-param">epoch</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.get_next_batch" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.is_valid_word">
-<code class="sig-name descname">is_valid_word</code><span class="sig-paren">(</span><em class="sig-param">word</em>, <em class="sig-param">remove_stopwords</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.is_valid_word" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.load_raw_data">
-<code class="sig-name descname">load_raw_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.load_raw_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.pad_sequence">
-<code class="sig-name descname">pad_sequence</code><span class="sig-paren">(</span><em class="sig-param">input_data</em>, <em class="sig-param">max_len</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.pad_sequence" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.pad_train_test">
-<code class="sig-name descname">pad_train_test</code><span class="sig-paren">(</span><em class="sig-param">max_len</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.pad_train_test" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.read_tsv_file">
-<code class="sig-name descname">read_tsv_file</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.read_tsv_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.set_train_validation">
-<code class="sig-name descname">set_train_validation</code><span class="sig-paren">(</span><em class="sig-param">val_size=0.25</em><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.set_train_validation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.setup_data">
-<code class="sig-name descname">setup_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.setup_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="popcorn.PopcornHelper.setup_train_test">
-<code class="sig-name descname">setup_train_test</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#popcorn.PopcornHelper.setup_train_test" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="popcorn-module">
+<h1>popcorn module<a class="headerlink" href="#popcorn-module" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
