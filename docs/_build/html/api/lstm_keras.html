@@ -163,7 +163,7 @@
 <p>The model will contain the following layers</p>
 <p>embeddings -&gt; LSTM -&gt; n * fully connected -&gt; output (1 unit)</p>
 <p>The information of all the graph configuration is saved in</p>
-<p>../../model/lstm_keras/graph_configs.json.</p>
+<p>../model/lstm_keras/graph_configs.json.</p>
 <p>They are in a list that look like [graph1_config, graph2_config, …]. The list index of a graph is its id.</p>
 <ul class="simple">
 <li><p>The actual graph is saved with the naming convention: graph_(graph id).json.</p></li>
@@ -185,28 +185,71 @@ the key includes “vocab_size”, “doc_len”, “lstm_units”, “embedding
 </dl>
 <dl class="method">
 <dt id="lstm_keras.ModelLSTM.build_graph">
-<code class="sig-name descname">build_graph</code><span class="sig-paren">(</span><em class="sig-param">config_dict</em>, <em class="sig-param">config_id</em><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.build_graph" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">build_graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.build_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>build sequential model according to the self.graph_config</p>
+<p>This function will only be called when self.graph_config cannot be found it config list. So after build the
+model it will save it to ../model/basic_lstm/graph_(config_id).json</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>model (tensorflow.python.keras.models.Sequential)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="lstm_keras.ModelLSTM.get_graph_config_id">
 <code class="sig-name descname">get_graph_config_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.get_graph_config_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get id of model graph configuration</p>
+<p>According to self.graph_config, check if any model with same configuration has been created before, If yes,
+get the id of graph configuration, return (id, True).
+If not, add the new config to the configuration list. return (len(config_list) - 1, False)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>config_id(int) - is the index of configuration in the config list</p></li>
+<li><p>found_existing(bool) - is whether found previously saved configuration</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="lstm_keras.ModelLSTM.load_exist_weight">
 <code class="sig-name descname">load_exist_weight</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.load_exist_weight" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>load weights to model</p>
+<p>If there is pre-trained weight (saved in ../model/basic_lstm/(config id)_weights.h5),
+load it the model</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lstm_keras.ModelLSTM.load_graph">
-<code class="sig-name descname">load_graph</code><span class="sig-paren">(</span><em class="sig-param">config_id</em><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.load_graph" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">load_graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.load_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load model from ../model/basic_lstm/graph_(config_id).json</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>model (tensorflow.python.keras.models.Sequential)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="lstm_keras.ModelLSTM.train">
 <code class="sig-name descname">train</code><span class="sig-paren">(</span><em class="sig-param">train_generator</em>, <em class="sig-param">train_config</em><span class="sig-paren">)</span><a class="headerlink" href="#lstm_keras.ModelLSTM.train" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>train the model</p>
+<p>Train the model. Save the training dynamics to tensorboard. Save the weights with the best validation result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_generator</strong> (<em>generator</em>) – generator for training batch</p></li>
+<li><p><strong>train_config</strong> (<em>dict</em>) – dict contain all the training information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>history of training process</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

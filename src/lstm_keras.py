@@ -17,7 +17,7 @@ class ModelLSTM:
 
         The information of all the graph configuration is saved in
 
-        ../../model/lstm_keras/graph_configs.json.
+        ../model/lstm_keras/graph_configs.json.
 
         They are in a list that look like [graph1_config, graph2_config, ...]. The list index of a graph is its id.
 
@@ -37,9 +37,9 @@ class ModelLSTM:
         self.verbose = verbose
 
         self.model_dir = model_dir
-        self.graph_config_path = self.model_dir + "graph_configs.json"
+        self.graph_config_path = "../model/basic_lstm/graph_configs.json"
 
-        self.log_path = self.model_dir + "logs"
+        self.log_path = "../model/basic_lstm/logs"
         self.model = None
         self.history = None
         self.graph_config = graph_config
@@ -52,14 +52,24 @@ class ModelLSTM:
         self.weight_path = self.model_dir + "model_" + str(self.config_id) + "_weights.h5"
 
         if found_exist:
-            self.model = self.load_graph(self.config_id)
+            self.model = self.load_graph()
             self.load_exist_weight()
         else:
-            self.model = self.build_graph(self.graph_config, self.config_id)
+            self.model = self.build_graph()
         print(self.model.summary())
-        self.log_path = self.model_dir + "log/" + str(self.config_id)
+        self.log_path = "../model/basic_lstm/log/" + str(self.config_id)
 
     def get_graph_config_id(self):
+        """ Get id of model graph configuration
+
+        According to self.graph_config, check if any model with same configuration has been created before, If yes,
+        get the id of graph configuration, return (id, True).
+        If not, add the new config to the configuration list. return (len(config_list) - 1, False)
+
+        :return:
+            - config_id(int) - is the index of configuration in the config list
+            - found_existing(bool) - is whether found previously saved configuration
+        """
         config_id = 0
         found_existing = False
         config_list = []
@@ -78,13 +88,20 @@ class ModelLSTM:
                 json.dump(config_list, json_file)
         return config_id, found_existing
 
-    def build_graph(self, config_dict, config_id):
-        lstm_units = config_dict["lstm_units"]
-        embedding_size = config_dict["embedding_size"]
-        dense_units = config_dict["dense_units"]
-        vocab_size = config_dict["vocab_size"]
-        doc_len = config_dict["doc_len"]
-        model_layers = []
+    def build_graph(self):
+        """ build sequential model according to the self.graph_config
+
+        This function will only be called when self.graph_config cannot be found it config list. So after build the
+        model it will save it to ../model/basic_lstm/graph_(config_id).json
+
+        :return: model (tensorflow.python.keras.models.Sequential)
+        """
+        lstm_units = self.graph_config["lstm_units"]
+        embedding_size = self.graph_config["embedding_size"]
+        dense_units = self.graph_config["dense_units"]
+        vocab_size = self.graph_config["vocab_size"]
+        doc_len = self.graph_config["doc_len"]
+        model_layers = list()
         model_layers.append(Embedding(input_dim=vocab_size, output_dim=embedding_size, input_length=doc_len))
         model_layers.append(LSTM(units=lstm_units, input_shape=(doc_len, embedding_size), return_sequences=False))
         for i in dense_units:
@@ -93,17 +110,28 @@ class ModelLSTM:
         model_layers.append(Dense(units=1, activation="sigmoid"))
         model = Sequential(model_layers)
         model_json = model.to_json()
-        with open(self.model_dir + "graph_" + str(config_id) + ".json", 'w') as json_file:
+        with open(self.model_dir + "graph_" + str(self.config_id) + ".json", 'w') as json_file:
             json_file.write(model_json)
         return model
 
-    def load_graph(self, config_id):
+    def load_graph(self):
+        """
+        Load model from ../model/basic_lstm/graph_(config_id).json
+
+        :return: model (tensorflow.python.keras.models.Sequential)
+        """
+
         with open(self.model_dir + "graph_" + str(config_id) + ".json", 'r') as json_file:
             model_json = json_file.read()
         model = model_from_json(model_json)
         return model
 
     def load_exist_weight(self):
+        """ load weights to model
+
+        If there is pre-trained weight (saved in ../model/basic_lstm/(config id)_weights.h5),
+        load it the model
+        """
         for file in os.listdir(self.model_dir):
             if file == "model_" + str(self.config_id) + "_weights.h5":
                 self.model.load_weights(self.weight_path)
@@ -112,6 +140,15 @@ class ModelLSTM:
                 break
 
     def train(self, train_generator, train_config):
+        """ train the model
+
+        Train the model. Save the training dynamics to tensorboard. Save the weights with the best validation result.
+
+        :param generator train_generator: generator for training batch
+        :param dict train_config: dict contain all the training information
+        :return: history of training process
+        """
+
         steps_p_epoch = train_config["steps_p_epoch"]
         eps = train_config["eps"]
         val_data = train_config["val_data"]
